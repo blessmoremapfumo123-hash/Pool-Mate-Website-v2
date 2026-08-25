@@ -1,0 +1,36 @@
+{
+  "url": "http://127.0.0.1:8080/",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "PoolMate",
+      "hasCanvas": false,
+      "bodyTextLen": 2777,
+      "bodyTextHash": "25596aa82e931e7dd0eca133a81d84f68f5c33433538a088c6599ae9eea576cd",
+      "bodyTextPrefix": "PoolMate Services How it works Get the app Log in Get started Lu",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "PoolMate",
+      "hasCanvas": false,
+      "bodyTextLen": 2731,
+      "bodyTextHash": "94e37f9fecb00c9cef283f18baffab962dd67b4aa47bbfc66c925e7f682e5a6d",
+      "bodyTextPrefix": "PoolMate Log in Lusaka · corridor pooling Same road. Split the f",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "authWarnings": [],
+  "verdictFile": "/workspace/screenshots/app-builder-preview.json"
+}
