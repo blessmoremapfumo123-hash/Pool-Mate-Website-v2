@@ -12,10 +12,12 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as DriveRouteImport } from './routes/drive'
+import { Route as FilesRouteImport } from './routes/files'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as SelectRoleRouteImport } from './routes/select-role'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as DashboardHistoryRouteImport } from './routes/dashboard/history'
+import { Route as DashboardPeopleRouteImport } from './routes/dashboard/people'
 import { Route as DashboardWalletRouteImport } from './routes/dashboard/wallet'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
@@ -32,6 +34,11 @@ const DashboardRoute = DashboardRouteImport.update({
 const DriveRoute = DriveRouteImport.update({
   id: '/drive',
   path: '/drive',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FilesRoute = FilesRouteImport.update({
+  id: '/files',
+  path: '/files',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -54,6 +61,11 @@ const DashboardHistoryRoute = DashboardHistoryRouteImport.update({
   path: '/history',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardPeopleRoute = DashboardPeopleRouteImport.update({
+  id: '/people',
+  path: '/people',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardWalletRoute = DashboardWalletRouteImport.update({
   id: '/wallet',
   path: '/wallet',
@@ -69,9 +81,11 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/drive': typeof DriveRoute
+  '/files': typeof FilesRoute
   '/login': typeof LoginRoute
   '/select-role': typeof SelectRoleRoute
   '/dashboard/history': typeof DashboardHistoryRoute
+  '/dashboard/people': typeof DashboardPeopleRoute
   '/dashboard/wallet': typeof DashboardWalletRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -79,9 +93,11 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/drive': typeof DriveRoute
+  '/files': typeof FilesRoute
   '/login': typeof LoginRoute
   '/select-role': typeof SelectRoleRoute
   '/dashboard/history': typeof DashboardHistoryRoute
+  '/dashboard/people': typeof DashboardPeopleRoute
   '/dashboard/wallet': typeof DashboardWalletRoute
   '/dashboard': typeof DashboardIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -91,9 +107,11 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/drive': typeof DriveRoute
+  '/files': typeof FilesRoute
   '/login': typeof LoginRoute
   '/select-role': typeof SelectRoleRoute
   '/dashboard/history': typeof DashboardHistoryRoute
+  '/dashboard/people': typeof DashboardPeopleRoute
   '/dashboard/wallet': typeof DashboardWalletRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -104,9 +122,11 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/drive'
+    | '/files'
     | '/login'
     | '/select-role'
     | '/dashboard/history'
+    | '/dashboard/people'
     | '/dashboard/wallet'
     | '/dashboard/'
     | '/api/auth/$'
@@ -114,9 +134,11 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/drive'
+    | '/files'
     | '/login'
     | '/select-role'
     | '/dashboard/history'
+    | '/dashboard/people'
     | '/dashboard/wallet'
     | '/dashboard'
     | '/api/auth/$'
@@ -125,9 +147,11 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/drive'
+    | '/files'
     | '/login'
     | '/select-role'
     | '/dashboard/history'
+    | '/dashboard/people'
     | '/dashboard/wallet'
     | '/dashboard/'
     | '/api/auth/$'
@@ -137,6 +161,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRoute: typeof DashboardRouteWithChildren
   DriveRoute: typeof DriveRoute
+  FilesRoute: typeof FilesRoute
   LoginRoute: typeof LoginRoute
   SelectRoleRoute: typeof SelectRoleRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
@@ -163,6 +188,13 @@ declare module '@tanstack/react-router' {
       path: '/drive'
       fullPath: '/drive'
       preLoaderRoute: typeof DriveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/files': {
+      id: '/files'
+      path: '/files'
+      fullPath: '/files'
+      preLoaderRoute: typeof FilesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -193,6 +225,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardHistoryRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/people': {
+      id: '/dashboard/people'
+      path: '/people'
+      fullPath: '/dashboard/people'
+      preLoaderRoute: typeof DashboardPeopleRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/wallet': {
       id: '/dashboard/wallet'
       path: '/wallet'
@@ -212,12 +251,14 @@ declare module '@tanstack/react-router' {
 
 interface DashboardRouteChildren {
   DashboardHistoryRoute: typeof DashboardHistoryRoute
+  DashboardPeopleRoute: typeof DashboardPeopleRoute
   DashboardWalletRoute: typeof DashboardWalletRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardHistoryRoute: DashboardHistoryRoute,
+  DashboardPeopleRoute: DashboardPeopleRoute,
   DashboardWalletRoute: DashboardWalletRoute,
   DashboardIndexRoute: DashboardIndexRoute,
 }
@@ -230,6 +271,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRoute: DashboardRouteWithChildren,
   DriveRoute: DriveRoute,
+  FilesRoute: FilesRoute,
   LoginRoute: LoginRoute,
   SelectRoleRoute: SelectRoleRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,

@@ -1,0 +1,22 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // School demo — lock this down before a public production launch.
+    match /users/{id} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.uid == id;
+    }
+    match /passengers/{id} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.uid == id;
+    }
+    match /drivers/{id} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.uid == id;
+    }
+    match /trips/{id} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+  }
+}

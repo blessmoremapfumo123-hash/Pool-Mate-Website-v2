@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Activity · PoolMate</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Sora:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="app-shell" id="app"></div>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/ui.js"></script>
+  <script>
+    PMUI.requireAuth({ needRole: true }).then(function (user) {
+      if (!user) return;
+      var nav = PMUI.appNav("activity");
+      PM.listMyTrips().then(function (trips) {
+        var cards = trips.length
+          ? trips.map(function (t) {
+              return (
+                '<article class="card" style="padding:1rem">' +
+                '<div style="display:flex;justify-content:space-between;gap:1rem">' +
+                "<div><p class='kicker'>" + (t.service || "rides") + "</p>" +
+                "<h3 style='margin-top:0.35rem;font-size:1.05rem'>" + t.pickup + "</h3>" +
+                '<p class="muted" style="font-size:0.875rem">to ' + t.dropoff + "</p></div>" +
+                "<div style='text-align:right'><strong>" + PM_DATA.kw(t.fare) + "</strong>" +
+                '<p class="muted" style="font-size:0.75rem;margin-top:0.35rem">' + (t.status || "") + "</p></div></div>" +
+                '<p class="muted" style="margin-top:0.75rem;font-size:0.75rem">' +
+                (t.vehicleClass || "") + (t.driverName ? " · " + t.driverName : "") +
+                "</p></article>"
+              );
+            }).join("")
+          : '<div class="card" style="padding:2.5rem;text-align:center"><h2 style="font-size:1.15rem">No trips yet</h2><p class="muted" style="margin-top:0.35rem">Request a PoolMate from the Book tab.</p></div>';
+        document.getElementById("app").innerHTML =
+          nav.sidebar +
+          '<div class="app-main">' + nav.top +
+          '<div class="app-body" style="padding:1.5rem;max-width:48rem">' +
+          "<h1 style='font-size:1.5rem'>Activity</h1>" +
+          '<p class="muted" style="margin-top:0.35rem;font-size:0.875rem">Trips stored on your passenger or driver record.</p>' +
+          '<div style="display:grid;gap:0.75rem;margin-top:1.25rem">' + cards + "</div></div>" +
+          nav.bottom + "</div>";
+        PMUI.bindLogout();
+      });
+    });
+  </script>
+</body>
+</html>

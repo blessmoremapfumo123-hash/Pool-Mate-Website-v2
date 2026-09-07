@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Choose role · PoolMate</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Sora:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <main class="wrap" style="padding:2rem 0 4rem;max-width:48rem">
+    <a class="logo" href="index.html" style="color:var(--brand)"></a>
+    <div style="text-align:center;margin-top:3.5rem">
+      <p class="kicker">Choose how you use PoolMate</p>
+      <h1 style="margin-top:0.75rem;font-size:clamp(1.8rem,4vw,2.4rem)">Passenger or driver?</h1>
+      <p class="muted" style="margin:0.75rem auto 0;max-width:28rem">You can switch later. Passengers book the super app. Drivers earn on the corridors they already drive.</p>
+    </div>
+    <div class="role-grid">
+      <button type="button" class="role-card" data-role="passenger">
+        <div class="icon-box">👤</div>
+        <h2 style="margin-top:1.25rem;font-size:1.25rem">Ride with PoolMate</h2>
+        <p class="muted" style="margin-top:0.5rem;font-size:0.875rem">Book corridor pools, private cars, cargo, food and parcels. Pay with Mobile Money or cash.</p>
+      </button>
+      <button type="button" class="role-card" data-role="driver">
+        <div class="icon-box">🚗</div>
+        <h2 style="margin-top:1.25rem;font-size:1.25rem">Drive with PoolMate</h2>
+        <p class="muted" style="margin-top:0.5rem;font-size:0.875rem">Go online, accept jobs on your route, and get paid locally. Keep the seats filled.</p>
+      </button>
+    </div>
+    <div id="driver-extra" hidden class="card" style="margin-top:1rem;padding:1rem;display:grid;gap:0.75rem">
+      <label class="field"><span>Vehicle</span><input class="input" id="vehicle" placeholder="Toyota Corolla" /></label>
+      <label class="field"><span>Number plate</span><input class="input" id="plate" placeholder="BAC 4412" /></label>
+    </div>
+    <p class="err" id="err" hidden style="text-align:center;margin-top:1rem"></p>
+    <div style="display:flex;justify-content:center;margin-top:2rem">
+      <button class="btn btn-lg" type="button" id="go" disabled>Continue</button>
+    </div>
+  </main>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/ui.js"></script>
+  <script>
+    var picked = null;
+    PMUI.requireAuth().then(function (user) {
+      if (!user) return;
+      document.querySelector(".logo").innerHTML = PMUI.logo + '<span style="color:var(--ink)">PoolMate</span>';
+      PMUI.$all("[data-role]").forEach(function (card) {
+        card.addEventListener("click", function () {
+          picked = card.getAttribute("data-role");
+          PMUI.$all("[data-role]").forEach(function (c) { c.classList.toggle("on", c === card); });
+          document.getElementById("driver-extra").hidden = picked !== "driver";
+          document.getElementById("go").disabled = false;
+        });
+      });
+      document.getElementById("go").addEventListener("click", function () {
+        var go = document.getElementById("go");
+        var err = document.getElementById("err");
+        go.disabled = true;
+        err.hidden = true;
+        PM.saveRole(picked, {
+          name: user.name,
+          phone: user.phone,
+          vehicle: document.getElementById("vehicle").value,
+          plate: document.getElementById("plate").value,
+        }).then(function (p) {
+          PMUI.toast("Saved to the " + p.role + "s collection");
+          location.href = p.role === "driver" ? "drive.html" : "dashboard.html";
+        }).catch(function (ex) {
+          err.hidden = false;
+          err.textContent = ex.message || "Could not save role";
+          go.disabled = false;
+        });
+      });
+    });
+  </script>
+</body>
+</html>

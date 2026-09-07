@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Drivers & passengers · PoolMate</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Sora:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div id="chrome-header"></div>
+  <main class="wrap section" style="padding-top:2rem">
+    <p class="kicker">Firebase collections</p>
+    <h1 style="margin-top:0.5rem;font-size:clamp(1.8rem,4vw,2.4rem)">Drivers and passengers</h1>
+    <p class="muted" style="margin-top:0.6rem;max-width:40rem">
+      Every login is written to a <strong>users</strong> document. Choosing a role adds the account to
+      either the <strong>passengers</strong> or <strong>drivers</strong> collection. Connect a Firebase
+      project below to store them in the cloud — until then the same collections live in this browser.
+    </p>
+    <p id="mode-line" class="cloud-pill" style="margin-top:1rem;display:inline-flex"></p>
+
+    <section class="card" style="margin-top:1.5rem;padding:1.25rem">
+      <h2 style="font-size:1.1rem">Connect Firebase</h2>
+      <p class="muted" style="margin-top:0.35rem;font-size:0.875rem">
+        Firebase Console → Project settings → Your apps → Web. Paste the six keys. Enable Email/Password
+        auth and Cloud Firestore (test mode).
+      </p>
+      <form id="cfg" class="grid-2" style="margin-top:1rem">
+        <label class="field"><span>apiKey</span><input class="input" name="apiKey" /></label>
+        <label class="field"><span>authDomain</span><input class="input" name="authDomain" /></label>
+        <label class="field"><span>projectId</span><input class="input" name="projectId" /></label>
+        <label class="field"><span>storageBucket</span><input class="input" name="storageBucket" /></label>
+        <label class="field"><span>messagingSenderId</span><input class="input" name="messagingSenderId" /></label>
+        <label class="field"><span>appId</span><input class="input" name="appId" /></label>
+        <div style="grid-column:1/-1;display:flex;gap:0.5rem;flex-wrap:wrap">
+          <button class="btn" type="submit">Save & connect</button>
+          <button class="btn btn-outline" type="button" id="reload">Refresh lists</button>
+        </div>
+      </form>
+      <p class="err" id="cfg-err" hidden style="margin-top:0.75rem"></p>
+    </section>
+
+    <div class="grid-2" style="margin-top:1.75rem;align-items:start">
+      <section>
+        <h2 style="font-size:1.2rem">Passengers <span class="muted" id="p-count"></span></h2>
+        <div class="table-wrap" style="margin-top:0.75rem"><table><thead><tr><th>Name</th><th>Email</th><th>Area</th></tr></thead><tbody id="p-body"></tbody></table></div>
+      </section>
+      <section>
+        <h2 style="font-size:1.2rem">Drivers <span class="muted" id="d-count"></span></h2>
+        <div class="table-wrap" style="margin-top:0.75rem"><table><thead><tr><th>Name</th><th>Vehicle</th><th>Status</th></tr></thead><tbody id="d-body"></tbody></table></div>
+      </section>
+    </div>
+  </main>
+  <div id="chrome-footer"></div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/ui.js"></script>
+  <script>
+    function fillForm(cfg) {
+      var form = document.getElementById("cfg");
+      ["apiKey","authDomain","projectId","storageBucket","messagingSenderId","appId"].forEach(function (k) {
+        if (cfg[k] && String(cfg[k]).indexOf("PASTE") !== 0 && String(cfg[k]).indexOf("YOUR_") !== 0) {
+          form.elements[k].value = cfg[k];
+        }
+      });
+    }
+    function renderLists() {
+      document.getElementById("mode-line").textContent = PM.isCloud()
+        ? "Firebase · live cloud database"
+        : "Local database · paste Firebase keys to go live";
+      document.getElementById("mode-line").className = "cloud-pill" + (PM.isCloud() ? "" : " local");
+      return Promise.all([PM.listPassengers(), PM.listDrivers()]).then(function (pair) {
+        var passengers = pair[0];
+        var drivers = pair[1];
+        document.getElementById("p-count").textContent = "(" + passengers.length + ")";
+        document.getElementById("d-count").textContent = "(" + drivers.length + ")";
+        document.getElementById("p-body").innerHTML = passengers.map(function (p) {
+          return "<tr><td>" + (p.name || "—") + "</td><td>" + (p.email || "") + "</td><td>" + (p.area || "Lusaka") + "</td></tr>";
+        }).join("") || "<tr><td colspan='3' class='muted'>No passengers yet. Create an account and pick Ride.</td></tr>";
+        document.getElementById("d-body").innerHTML = drivers.map(function (d) {
+          return "<tr><td>" + (d.name || "—") + "</td><td>" + [d.vehicle, d.plate].filter(Boolean).join(" · ") + "</td><td>" + (d.status || "—") + "</td></tr>";
+        }).join("") || "<tr><td colspan='3' class='muted'>No drivers yet. Create an account and pick Drive.</td></tr>";
+      });
+    }
+    PM.boot().then(function () {
+      document.getElementById("chrome-header").innerHTML = PMUI.header();
+      document.getElementById("chrome-footer").innerHTML = PMUI.footer();
+      PMUI.bindChrome();
+      fillForm(PM.getConfig());
+      renderLists();
+      document.getElementById("reload").addEventListener("click", function () {
+        renderLists().then(function () { PMUI.toast("Lists refreshed"); });
+      });
+      document.getElementById("cfg").addEventListener("submit", function (e) {
+        e.preventDefault();
+        var fd = new FormData(e.target);
+        var cfg = {
+          apiKey: String(fd.get("apiKey") || "").trim(),
+          authDomain: String(fd.get("authDomain") || "").trim(),
+          projectId: String(fd.get("projectId") || "").trim(),
+          storageBucket: String(fd.get("storageBucket") || "").trim(),
+          messagingSenderId: String(fd.get("messagingSenderId") || "").trim(),
+          appId: String(fd.get("appId") || "").trim(),
+        };
+        var err = document.getElementById("cfg-err");
+        err.hidden = true;
+        if (!PM.isLiveConfig(cfg)) {
+          err.hidden = false;
+          err.textContent = "Paste a real apiKey and projectId from Firebase (not the YOUR_ placeholders).";
+          return;
+        }
+        PM.saveConfig(cfg).then(function () {
+          if (!PM.isCloud()) {
+            err.hidden = false;
+            err.textContent = "Keys saved, but Firebase did not connect. Check Auth + Firestore are enabled, then reload.";
+          } else {
+            PMUI.toast("Connected to Firebase");
+          }
+          return renderLists();
+        }).catch(function (ex) {
+          err.hidden = false;
+          err.textContent = ex.message || "Could not connect";
+        });
+      });
+    });
+  </script>
+</body>
+</html>

@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 const NAV = [
   { href: "/#services", label: "Services" },
   { href: "/#how", label: "How it works" },
-  { href: "/#download", label: "Get the app" },
+  { href: "/files", label: "HTML files" },
 ];
 
 export function SiteHeader({ solid = false }: { solid?: boolean }) {

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Drive · PoolMate</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Sora:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="app-shell" id="app"></div>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/ui.js"></script>
+  <script>
+    PMUI.requireAuth({ needRole: true }).then(function (user) {
+      if (!user) return;
+      var nav = PMUI.appNav("drive");
+      var online = true;
+      var jobs = PM_DATA.jobs.slice();
+      function render() {
+        document.getElementById("app").innerHTML =
+          nav.sidebar +
+          '<div class="app-main">' + nav.top +
+          '<div class="app-body" style="padding:1.25rem">' +
+          '<div style="display:flex;justify-content:space-between;gap:1rem;align-items:center;flex-wrap:wrap">' +
+          "<div><p class='kicker'>Driver</p><h1 style='margin-top:0.35rem;font-size:1.5rem'>Go online</h1>" +
+          "<p class='muted' style='font-size:0.875rem'>Jobs on your corridor. Completing a trip writes to the drivers collection.</p></div>" +
+          '<button class="btn ' + (online ? "btn-ok" : "btn-outline") + '" id="power" type="button">' +
+          (online ? "Online" : "Offline") + "</button></div>" +
+          '<div id="feed" class="grid-2" style="margin-top:1.25rem"></div></div>' + nav.bottom + "</div>";
+        PMUI.bindLogout();
+        document.getElementById("power").addEventListener("click", function () {
+          online = !online;
+          PM.setDriverStatus(online ? "online" : "offline").then(render);
+        });
+        var feed = document.getElementById("feed");
+        if (!online) {
+          feed.innerHTML = '<p class="muted">You are offline. Go online to see jobs.</p>';
+          return;
+        }
+        jobs.forEach(function (job, i) {
+          var el = document.createElement("article");
+          el.className = "card";
+          el.style.padding = "1rem";
+          el.innerHTML =
+            '<p class="kicker">' + job.klass + "</p>" +
+            "<h3 style='margin-top:0.4rem;font-size:1.05rem'>" + job.pickup + "</h3>" +
+            '<p class="muted" style="font-size:0.875rem">to ' + job.dropoff + "</p>" +
+            '<div class="fare-row"><strong>' + PM_DATA.kw(job.fare) + '</strong>' +
+            '<button class="btn btn-sm" type="button">Accept</button></div>';
+          el.querySelector("button").addEventListener("click", function () {
+            PM.saveTrip({
+              pickup: job.pickup,
+              dropoff: job.dropoff,
+              vehicleClass: job.klass,
+              fare: job.fare,
+              status: "completed",
+              driverName: user.name,
+              passengerId: "seed-p-1",
+            }).then(function () {
+              jobs.splice(i, 1);
+              PMUI.toast("Trip completed · saved to your driver record");
+              render();
+            });
+          });
+          feed.appendChild(el);
+        });
+      }
+      render();
+    });
+  </script>
+</body>
+</html>

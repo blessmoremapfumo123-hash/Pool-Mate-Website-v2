@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Book · PoolMate</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Sora:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="app-shell" id="app"></div>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/ui.js"></script>
+  <script>
+    PMUI.requireAuth({ needRole: true }).then(function (user) {
+      if (!user) return;
+      var nav = PMUI.appNav("book");
+      var draft = {};
+      try { draft = JSON.parse(sessionStorage.getItem("pm.draft") || "{}"); } catch (e) {}
+      var klass = "pool";
+      document.getElementById("app").innerHTML =
+        nav.sidebar +
+        '<div class="app-main">' + nav.top +
+        '<div class="app-body book-layout">' +
+        '<div class="book-panel">' +
+        '<p class="kicker">Passenger</p>' +
+        '<h1 style="margin-top:0.4rem;font-size:1.5rem">Book a PoolMate</h1>' +
+        '<p class="muted" style="margin-top:0.35rem;font-size:0.875rem">Fare is locked before you confirm. Saved to your passenger record.</p>' +
+        '<div class="chip-row" style="margin-top:1rem" id="classes"></div>' +
+        '<form id="book" style="display:grid;gap:0.75rem;margin-top:1rem;position:relative">' +
+        '<label class="field" style="position:relative"><span>Pickup</span><input class="input" id="pickup" value="' + (draft.pickup || "") + '" autocomplete="off" required /><div class="suggest" id="sug-p" hidden></div></label>' +
+        '<label class="field" style="position:relative"><span>Where to</span><input class="input" id="dropoff" value="' + (draft.dropoff || "") + '" autocomplete="off" required /><div class="suggest" id="sug-d" hidden></div></label>' +
+        '<div class="fare-row"><span class="muted">Estimated fare</span><strong id="fare">—</strong></div>' +
+        '<button class="btn btn-lg btn-full" type="submit">Request ride</button>' +
+        '</form>' +
+        '<div id="live" style="margin-top:1rem"></div>' +
+        '</div>' +
+        '<div class="book-map"><svg viewBox="0 0 400 400" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="400" height="400" fill="#fff1e6"/><path d="M20 340 C 90 300, 140 240, 220 180 S 330 80, 380 40" fill="none" stroke="#f05a10" stroke-width="7" stroke-linecap="round"/><circle cx="40" cy="330" r="9" fill="#1c1917"/><circle cx="360" cy="50" r="9" fill="#f05a10"/></svg></div>' +
+        '</div>' + nav.bottom + '</div>';
+      PMUI.bindLogout();
+      var box = document.getElementById("classes");
+      PM_DATA.classes.forEach(function (c) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "chip" + (c.id === klass ? " on" : "");
+        b.textContent = c.name;
+        b.addEventListener("click", function () {
+          klass = c.id;
+          PMUI.$all(".chip", box).forEach(function (x) { x.classList.remove("on"); });
+          b.classList.add("on");
+          updateFare();
+        });
+        box.appendChild(b);
+      });
+      function bindSuggest(input, panel) {
+        input.addEventListener("input", function () {
+          var hits = PM_DATA.suggest(input.value);
+          panel.hidden = !hits.length;
+          panel.innerHTML = hits.map(function (h) {
+            return '<button type="button" data-n="' + h.name + '">' + h.name + '<div class="muted" style="font-size:0.75rem">' + h.area + "</div></button>";
+          }).join("");
+          PMUI.$all("button", panel).forEach(function (btn) {
+            btn.addEventListener("click", function () {
+              input.value = btn.getAttribute("data-n");
+              panel.hidden = true;
+              updateFare();
+            });
+          });
+          updateFare();
+        });
+      }
+      bindSuggest(document.getElementById("pickup"), document.getElementById("sug-p"));
+      bindSuggest(document.getElementById("dropoff"), document.getElementById("sug-d"));
+      function updateFare() {
+        var p = document.getElementById("pickup").value;
+        var d = document.getElementById("dropoff").value;
+        document.getElementById("fare").textContent = p && d ? PM_DATA.kw(PM_DATA.quote(klass, p, d)) : "—";
+      }
+      updateFare();
+      document.getElementById("book").addEventListener("submit", function (e) {
+        e.preventDefault();
+        var pickup = document.getElementById("pickup").value;
+        var dropoff = document.getElementById("dropoff").value;
+        var fare = PM_DATA.quote(klass, pickup, dropoff);
+        var k = PM_DATA.classes.find(function (c) { return c.id === klass; });
+        PM.saveTrip({
+          pickup: pickup,
+          dropoff: dropoff,
+          vehicleClass: k.name,
+          fare: fare,
+          status: "matched",
+          driverName: "Chanda Mwale",
+          driverVehicle: "Toyota Corolla · BAC 4412",
+          payMethod: "mobile_money",
+        }).then(function (trip) {
+          document.getElementById("live").innerHTML =
+            '<article class="card" style="padding:1rem">' +
+            '<p class="kicker">Matched</p>' +
+            "<h3 style='margin-top:0.4rem'>" + trip.driverName + "</h3>" +
+            '<p class="muted" style="font-size:0.875rem">' + trip.driverVehicle + "</p>" +
+            '<p style="margin-top:0.75rem">' + pickup + " → " + dropoff + "</p>" +
+            "<p><strong>" + PM_DATA.kw(fare) + "</strong> · saved to your passenger trips</p></article>";
+          PMUI.toast("Trip saved for " + user.name);
+        }).catch(function (ex) { PMUI.toast(ex.message); });
+      });
+    });
+  </script>
+</body>
+</html>

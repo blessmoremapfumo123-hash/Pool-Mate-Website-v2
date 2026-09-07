@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PoolMate — Same road. Split the fare.</title>
+  <meta name="description" content="Corridor pooling for Lusaka — rides, cargo, food and delivery. Pay with Mobile Money." />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div id="chrome-header"></div>
+  <main>
+    <section class="wrap hero">
+      <div>
+        <span class="badge">Lusaka · corridor pooling</span>
+        <h1 style="margin-top:1.25rem">Same road. <em>Split the fare.</em></h1>
+        <p class="lead">PoolMate matches you on Lusaka’s busiest corridors — then cargo, food and parcels, paid with Mobile Money.</p>
+        <form id="quick-book" class="card" style="margin-top:2rem;max-width:28rem;padding:1rem;display:grid;gap:0.6rem">
+          <label class="field"><span>Pickup</span>
+            <input class="input" name="pickup" placeholder="Cairo Road, CBD" autocomplete="off" required />
+          </label>
+          <label class="field"><span>Where to</span>
+            <input class="input" name="dropoff" placeholder="Kenneth Kaunda Airport" autocomplete="off" required />
+          </label>
+          <button class="btn btn-lg" type="submit">See fare & continue</button>
+        </form>
+      </div>
+      <div class="hero-visual">
+        <svg class="map-svg" viewBox="0 0 400 260" aria-hidden="true">
+          <rect width="400" height="260" rx="16" fill="#fffbf7"/>
+          <path d="M20 210 C 80 180, 140 160, 210 110 S 320 40, 380 28" fill="none" stroke="#f05a10" stroke-width="6" stroke-linecap="round"/>
+          <path d="M40 40 C 90 90, 70 150, 120 190 S 220 230, 300 200" fill="none" stroke="#e7e5e4" stroke-width="4"/>
+          <circle cx="48" cy="198" r="8" fill="#1c1917"/>
+          <circle cx="352" cy="36" r="8" fill="#f05a10"/>
+          <rect x="24" y="16" width="120" height="36" rx="10" fill="#fff1e6"/>
+          <text x="36" y="39" font-size="12" font-family="Manrope,sans-serif" fill="#c2410c">Great East Rd</text>
+        </svg>
+        <p class="muted" style="margin-top:0.75rem;font-size:0.8rem">Live corridors · CBD → Airport · Kafue Road · UNZA run</p>
+      </div>
+    </section>
+
+    <section id="services" class="section section-cream">
+      <div class="wrap">
+        <p class="kicker">Services</p>
+        <h2 style="margin-top:0.75rem;font-size:clamp(1.8rem,4vw,2.4rem)">One app. Four ways to move.</h2>
+        <p class="muted" style="margin-top:0.75rem;max-width:36rem">Built like a super app, priced for daily travel. Pick a service, set pickup and where to, and go.</p>
+        <div class="grid-4" style="margin-top:2.5rem">
+          <article class="svc"><div class="icon-box">🚲</div><h3>Rides</h3><p class="tag">Corridor + private</p><p>Share a fixed route or take a car of your own. Live tracking, verified drivers.</p></article>
+          <article class="svc"><div class="icon-box">🚚</div><h3>Cargo</h3><p class="tag">Vans & trucks</p><p>Move furniture, stock or site materials with a sized vehicle and a helper.</p></article>
+          <article class="svc"><div class="icon-box">🍲</div><h3>Food</h3><p class="tag">From kitchens nearby</p><p>Order from Lusaka kitchens and have it at your gate, still hot.</p></article>
+          <article class="svc"><div class="icon-box">📦</div><h3>Delivery</h3><p class="tag">Parcels in the city</p><p>Send a package across town the way you would book a ride.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap" style="text-align:center">
+        <h2 style="font-size:clamp(1.8rem,4vw,2.4rem)">Why choose PoolMate?</h2>
+        <p class="muted" style="margin-top:0.75rem">Built for real daily travel needs.</p>
+        <div class="grid-3" style="margin-top:3rem;text-align:left">
+          <article class="card" style="padding:1.5rem"><div class="icon-box">📍</div><h3 style="margin-top:1.25rem;color:var(--brand)">Corridor pooling</h3><p class="muted" style="margin-top:0.5rem;font-size:0.875rem">Share rides on fixed popular routes and cut your daily transport cost — without the chaos of street-hailing.</p></article>
+          <article class="card" style="padding:1.5rem"><div class="icon-box">🛡️</div><h3 style="margin-top:1.25rem;color:var(--brand)">Safety first</h3><p class="muted" style="margin-top:0.5rem;font-size:0.875rem">Verified drivers, vehicle checks, live route sharing and a one-tap emergency line.</p></article>
+          <article class="card" style="padding:1.5rem"><div class="icon-box">💳</div><h3 style="margin-top:1.25rem;color:var(--brand)">Local payments</h3><p class="muted" style="margin-top:0.5rem;font-size:0.875rem">Airtel Money, MTN MoMo or cash. The fare is locked before you sit down.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="how" class="section how">
+      <div class="wrap">
+        <p class="kicker">How it works</p>
+        <h2 style="margin-top:0.75rem;font-size:clamp(1.8rem,4vw,2.4rem)">Three steps. Then you’re moving.</h2>
+        <div class="grid-3" style="margin-top:3rem">
+          <article class="how-card"><p class="n">01</p><h3>Set pickup and where to</h3><p>Choose a corridor stop or any Lusaka landmark. See the fare before you confirm.</p></article>
+          <article class="how-card"><p class="n">02</p><h3>Match on the stretch</h3><p>Pool with others heading the same way, or take Economy, Comfort or XL to yourself.</p></article>
+          <article class="how-card"><p class="n">03</p><h3>Pay the way you already pay</h3><p>Mobile Money or cash. Rate the trip. Your history and wallet stay in the app.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap cta-band">
+        <div>
+          <span class="badge">Earn</span>
+          <h2 style="margin-top:1rem;font-size:1.85rem">Drive the corridor you already know.</h2>
+          <p class="muted" style="margin-top:0.75rem;max-width:28rem;font-size:0.9rem">Go online, fill empty seats, and take cargo or parcels on the way. Payouts land in Mobile Money.</p>
+          <a class="btn btn-lg" href="login.html" style="margin-top:1.5rem">Become a driver</a>
+        </div>
+        <ul>
+          <li>Keep your own hours on Great East, Kafue and the CBD loop</li>
+          <li>See the fare before you accept</li>
+          <li>Vehicle checks and in-app support</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+  <div id="chrome-footer"></div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/ui.js"></script>
+  <script>
+    PM.boot().then(function () {
+      document.getElementById("chrome-header").innerHTML = PMUI.header();
+      document.getElementById("chrome-footer").innerHTML = PMUI.footer();
+      PMUI.bindChrome();
+      document.getElementById("quick-book").addEventListener("submit", function (e) {
+        e.preventDefault();
+        var fd = new FormData(e.target);
+        sessionStorage.setItem("pm.draft", JSON.stringify({
+          pickup: fd.get("pickup"),
+          dropoff: fd.get("dropoff"),
+          service: "rides"
+        }));
+        location.href = PM.currentUser() ? "dashboard.html" : "login.html";
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Log in · PoolMate</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Sora:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <main class="auth-page">
+    <section class="auth-side">
+      <a class="logo" href="index.html" style="color:var(--brand-fg)"></a>
+      <div style="margin:auto 0;max-width:26rem;padding:3rem 0">
+        <p style="opacity:.7;font-size:0.75rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase">Lusaka · corridor pooling</p>
+        <h1 style="margin-top:1rem;font-size:2.4rem">Same road.<br/>Split the fare.</h1>
+        <p style="margin-top:1rem;opacity:.85">Sign in to book a Pool, send cargo, order food or dispatch a parcel — paid with Mobile Money.</p>
+      </div>
+      <p style="opacity:.7;font-size:0.875rem">Verified drivers · live tracking · local pay</p>
+    </section>
+    <section class="auth-form">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <a class="logo" href="index.html" style="color:var(--brand)"></a>
+        <a class="muted" href="index.html" style="font-size:0.875rem">Back</a>
+      </div>
+      <div style="margin:auto 0;width:min(24rem,100%)">
+        <h2 id="title">Welcome back</h2>
+        <p class="muted" id="sub" style="margin-top:0.35rem">Log in to request a PoolMate.</p>
+        <div class="tabs" role="tablist">
+          <button type="button" class="on" data-mode="in">Log in</button>
+          <button type="button" data-mode="up">Create account</button>
+        </div>
+        <form id="form" style="display:grid;gap:0.75rem">
+          <label class="field" id="name-field" hidden><span>Name</span>
+            <input class="input" name="name" placeholder="Chanda Mwale" autocomplete="name" />
+          </label>
+          <label class="field" id="phone-field" hidden><span>Phone</span>
+            <input class="input" name="phone" placeholder="097 000 0000" autocomplete="tel" />
+          </label>
+          <label class="field"><span>Email</span>
+            <input class="input" type="email" name="email" required placeholder="you@email.com" autocomplete="email" />
+          </label>
+          <label class="field"><span>Password</span>
+            <input class="input" type="password" name="password" required minlength="6" placeholder="At least 6 characters" />
+          </label>
+          <p class="err" id="err" hidden></p>
+          <button class="btn btn-full" type="submit" id="go">Log in with email</button>
+        </form>
+        <p class="muted" style="margin-top:1.5rem;font-size:0.75rem;text-align:center">
+          Accounts are stored in Firebase <strong>passengers</strong> and <strong>drivers</strong> collections after you pick a role.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/ui.js"></script>
+  <script>
+    var mode = "in";
+    PM.boot().then(function () {
+      document.querySelectorAll(".logo").forEach(function (el) {
+        el.innerHTML = PMUI.logo + "<span>PoolMate</span>";
+      });
+      if (PM.currentUser()) return PMUI.afterLogin(PM.currentUser());
+      PMUI.$all("[data-mode]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          mode = btn.getAttribute("data-mode");
+          PMUI.$all("[data-mode]").forEach(function (b) { b.classList.toggle("on", b === btn); });
+          document.getElementById("name-field").hidden = mode !== "up";
+          document.getElementById("phone-field").hidden = mode !== "up";
+          document.getElementById("title").textContent = mode === "up" ? "Create your account" : "Welcome back";
+          document.getElementById("sub").textContent = mode === "up"
+            ? "One account for rides, cargo, food and delivery."
+            : "Log in to request a PoolMate.";
+          document.getElementById("go").textContent = mode === "up" ? "Create account" : "Log in with email";
+        });
+      });
+      document.getElementById("form").addEventListener("submit", function (e) {
+        e.preventDefault();
+        var fd = new FormData(e.target);
+        var err = document.getElementById("err");
+        var go = document.getElementById("go");
+        err.hidden = true;
+        go.disabled = true;
+        var job = mode === "up"
+          ? PM.signUp({ name: fd.get("name"), email: fd.get("email"), password: fd.get("password"), phone: fd.get("phone") })
+          : PM.signIn({ email: fd.get("email"), password: fd.get("password") });
+        job.then(PMUI.afterLogin).catch(function (ex) {
+          err.hidden = false;
+          err.textContent = ex.message || "Could not continue";
+          go.disabled = false;
+        });
+      });
+    });
+  </script>
+</body>
+</html>

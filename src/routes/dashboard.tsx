@@ -5,6 +5,7 @@ import {
   Clock3,
   LayoutDashboard,
   Menu,
+  Users,
   Wallet,
   X,
 } from "lucide-react";
@@ -23,6 +24,7 @@ export const Route = createFileRoute("/dashboard")({
 const NAV = [
   { to: "/dashboard", label: "Book", icon: LayoutDashboard },
   { to: "/dashboard/history", label: "Activity", icon: Clock3 },
+  { to: "/dashboard/people", label: "People", icon: Users },
   { to: "/dashboard/wallet", label: "Wallet", icon: Wallet },
   { to: "/drive", label: "Drive", icon: CarFront },
 ] as const;
@@ -105,7 +107,7 @@ function DashboardLayout() {
         <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
           <Outlet />
         </div>
-        <nav className="grid grid-cols-4 border-t border-line bg-paper md:hidden">
+        <nav className="grid grid-cols-5 border-t border-line bg-paper md:hidden">
           {NAV.map((item) => (
             <Link
               key={item.to}

@@ -5,6 +5,7 @@ import { CarFront, UserRound } from "lucide-react";
 import { RedirectToSignIn } from "@/lib/auth/gates";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { getMyProfile, saveMyRole } from "@/lib/poolmate/api";
+import { mapAppRole, upsertDirectoryProfile } from "@/lib/firebase/store";
 import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -33,6 +34,12 @@ function SelectRolePage() {
         data: { role, displayName: user?.displayName ?? undefined },
       }),
     onSuccess: async (p) => {
+      upsertDirectoryProfile({
+        id: user?.id ?? p.userId,
+        name: p.displayName || user?.displayName || user?.primaryEmail || "Member",
+        email: user?.primaryEmail || "",
+        role: mapAppRole(p.role ?? "rider"),
+      });
       await qc.invalidateQueries({ queryKey: ["profile"] });
       void navigate({ to: p.role === "driver" ? "/drive" : "/dashboard" });
     },

@@ -30,6 +30,11 @@ export function SiteFooter() {
               </a>
             </li>
             <li>
+              <a href="/files" className="hover:text-brand-fg">
+                HTML files
+              </a>
+            </li>
+            <li>
               <a href="/login" className="hover:text-brand-fg">
                 Log in
               </a>
